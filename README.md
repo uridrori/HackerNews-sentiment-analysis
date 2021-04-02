@@ -3,4 +3,8 @@ stuff to mention in final readme:
 
 python
 requests
-AWS/Google Cloud
+AWS comprehend
+statistics library
+Flask
+serverless wsgi
+serverless-python-requirements

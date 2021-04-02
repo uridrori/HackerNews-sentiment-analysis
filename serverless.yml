@@ -1,0 +1,22 @@
+org: uridrori
+app: aws-python-rest-api
+service: aws-python-rest-api
+
+frameworkVersion: '2'
+
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: '20201221'
+
+functions:
+  analyze_sentiment:
+    handler: handler.analyze_sentiment
+    events:
+      - http:
+          path: /
+          method: get
+          request:
+            template:
+              application/json: '{"phrase": "$input.params(''phrase'')" }'

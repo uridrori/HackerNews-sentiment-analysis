@@ -1,0 +1,24 @@
+{
+  "name": "Exabeam",
+  "version": "1.0.0",
+  "description": "stuff to mention in final readme:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uridrori/HackerNews-sentiment-analysis.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uridrori/HackerNews-sentiment-analysis/issues"
+  },
+  "homepage": "https://github.com/uridrori/HackerNews-sentiment-analysis#readme",
+  "devDependencies": {
+    "serverless-python-requirements": "^5.1.1",
+    "serverless-wsgi": "^1.7.6"
+  }
+}
