@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\uriga\PycharmProjects\Exabeam\venv"
+VIRTUAL_ENV="C:\Users\uriga\PycharmProjects\hn-rest-api\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
