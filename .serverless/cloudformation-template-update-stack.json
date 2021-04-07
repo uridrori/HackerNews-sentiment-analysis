@@ -207,7 +207,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/hn-rest-api/dev/1617482117760-2021-04-03T20:35:17.760Z/hn-rest-api.zip"
+          "S3Key": "serverless/hn-rest-api/dev/1617544828905-2021-04-04T14:00:28.905Z/hn-rest-api.zip"
         },
         "Handler": "s_analyze.handler",
         "Runtime": "python3.8",
@@ -225,14 +225,14 @@
         "AnalyzeLogGroup"
       ]
     },
-    "AnalyzeLambdaVersioncLGbsVuLwETtggMdiQjTV8FU9MZuQVuaMZnqMbDTXY": {
+    "AnalyzeLambdaVersionsKNlsXhXs6uqWq3S0d0gpDjK98YppBf3QGrtsBFgs": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AnalyzeLambdaFunction"
         },
-        "CodeSha256": "hclPPiCZGCh/5P1Q6vIcba/dppAK0+5RbI2IxND+5Lg="
+        "CodeSha256": "/36bLlBwYZw0wo0zYCywiT+pB5fm3MhO/8SkfrTmVTw="
       }
     },
     "HttpApi": {
@@ -384,7 +384,7 @@
     "AnalyzeLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AnalyzeLambdaVersioncLGbsVuLwETtggMdiQjTV8FU9MZuQVuaMZnqMbDTXY"
+        "Ref": "AnalyzeLambdaVersionsKNlsXhXs6uqWq3S0d0gpDjK98YppBf3QGrtsBFgs"
       }
     },
     "HttpApiId": {

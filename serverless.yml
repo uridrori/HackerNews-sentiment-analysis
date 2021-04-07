@@ -67,6 +67,8 @@ functions:
       - httpApi:
           path: /
           method: get
+    timeout:
+      120
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
