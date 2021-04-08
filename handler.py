@@ -6,9 +6,6 @@ from statistics import mean, median
 import aiohttp
 import boto3
 import requests
-import nest_asyncio
-
-nest_asyncio.apply()
 
 # TODO: class instead of these?
 comprehend = boto3.client(service_name='comprehend')
@@ -17,7 +14,7 @@ num_of_comments = [0]
 scores_by_sentiment = {'Positive': [], 'Negative': [], 'Neutral': [], 'Mixed': []}
 
 
-# TODO: check size limit case
+# TODO: Read instructions again
 # TODO: check errors in all requests
 # TODO: improve readability/aesthetics
 # TODO: document
@@ -49,13 +46,14 @@ scores_by_sentiment = {'Positive': [], 'Negative': [], 'Neutral': [], 'Mixed': [
 
 
 async def handle_comment(response):
-    text = json.loads(response)['text']
-    sentiments_response = comprehend.detect_sentiment(Text=text, LanguageCode='en')
-    all_sentiment_scores = sentiments_response['SentimentScore']
-    scores_by_sentiment['Positive'].append(all_sentiment_scores['Positive'])
-    scores_by_sentiment['Negative'].append(all_sentiment_scores['Negative'])
-    scores_by_sentiment['Neutral'].append(all_sentiment_scores['Neutral'])
-    scores_by_sentiment['Mixed'].append(all_sentiment_scores['Mixed'])
+    if 'text' in json.loads(response):
+        text = json.loads(response)['text']
+        sentiments_response = comprehend.detect_sentiment(Text=text, LanguageCode='en')
+        all_sentiment_scores = sentiments_response['SentimentScore']
+        scores_by_sentiment['Positive'].append(all_sentiment_scores['Positive'])
+        scores_by_sentiment['Negative'].append(all_sentiment_scores['Negative'])
+        scores_by_sentiment['Neutral'].append(all_sentiment_scores['Neutral'])
+        scores_by_sentiment['Mixed'].append(all_sentiment_scores['Mixed'])
 
 
 # async def analyze_all_comments(comments):
@@ -176,41 +174,32 @@ async def run(phrase):
     #     await analyze_story(story_request_string, phrase)
 
 
-async def analyze_sentiment(event, context):
+def analyze_sentiment(event, context):
+    #TODO: remove
     if event is None:
         phrase = 'ios'
     else:
-        phrase = event['queryStringParameters']['phrase']
+        print(event["queryStringParameters"])
+        phrase = event["queryStringParameters"]["phrase"]
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(run(phrase))
     loop.run_until_complete(future)
     result = {'comments': num_of_comments[0]}
+    # TODO: handle edge cases (Empty, something else?)
     for sentiment in scores_by_sentiment.keys():
         scores = scores_by_sentiment[sentiment]
         result[sentiment.lower()] = {'median': median(scores), 'avg': mean(scores)}
-    jbody = json.dumps(result)
-    return jbody
+    # return {"statusCode": 200, "body": result}
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json'},
+        'body': json.dumps(result)
+    }
+    # return {
+    #     "message": "Go Serverless v1.0! Your function executed successfully!",
+    #     "event": result
+    # }
 
-
-# async def get(url):
-#     try:
-#         async with aiohttp.ClientSession() as session:
-#             async with session.get(url=url) as response:
-#                 resp = await response.read()
-#                 print("Successfully got url {} with response of length {}.".format(url, len(resp)))
-#     except Exception as e:
-#         print("Unable to get url {} due to {}.".format(url, e.__class__))
-
-
-# async def main(urls, amount):
-#     ret = await asyncio.gather(*[get(url) for url in urls])
-#     print("Finalized all. ret is a list of len {} outputs.".format(len(ret)))
-
-
-# urls = websites.split("\n")
-# amount = len(urls)
-#
-# asyncio.run(main(urls, amount))
 
 if __name__ == '__main__':
-    asyncio.run(analyze_sentiment(None, None))
+    analyze_sentiment(None, None)

@@ -8,6 +8,15 @@
       "name": "aws",
       "runtime": "python3.8",
       "lambdaHashingVersion": "20201221",
+      "iamRoleStatements": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "comprehend:DetectSentiment"
+          ],
+          "Resource": "*"
+        }
+      ],
       "stage": "dev",
       "variableSyntax": "\\${([^{}:]+?(?:\\(|:)(?:[^:{}][^{}]*?)?)}",
       "region": "us-east-1",
@@ -147,6 +156,9 @@
                             "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/hn-rest-api-dev*:*:*"
                           }
                         ]
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][0]"
                       }
                     ]
                   }
@@ -221,13 +233,13 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/hn-rest-api/dev/1617544828905-2021-04-04T14:00:28.905Z/hn-rest-api.zip"
+                "S3Key": "serverless/hn-rest-api/dev/1617875578624-2021-04-08T09:52:58.624Z/hn-rest-api.zip"
               },
               "Handler": "s_analyze.handler",
               "Runtime": "python3.8",
               "FunctionName": "hn-rest-api-dev-analyze",
               "MemorySize": 1024,
-              "Timeout": 6,
+              "Timeout": 120,
               "Role": {
                 "Fn::GetAtt": [
                   "IamRoleLambdaExecution",
@@ -239,53 +251,87 @@
               "AnalyzeLogGroup"
             ]
           },
-          "AnalyzeLambdaVersionsKNlsXhXs6uqWq3S0d0gpDjK98YppBf3QGrtsBFgs": {
+          "AnalyzeLambdaVersionpne3Ec1cHunrJvFwIHdRCmBoAUx7elr6x20aFZgqVE": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AnalyzeLambdaFunction"
               },
-              "CodeSha256": "/36bLlBwYZw0wo0zYCywiT+pB5fm3MhO/8SkfrTmVTw="
+              "CodeSha256": "TkUnBVU2inEOgY4U9MYG4ZTXduUebvHnYHOgoq+h8gA="
             }
           },
-          "HttpApi": {
-            "Type": "AWS::ApiGatewayV2::Api",
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
             "Properties": {
               "Name": "dev-hn-rest-api",
-              "ProtocolType": "HTTP"
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              },
+              "Policy": ""
             }
           },
-          "HttpApiLogGroup": {
-            "Type": "AWS::Logs::LogGroup",
+          "ApiGatewayMethodGet": {
+            "Type": "AWS::ApiGateway::Method",
             "Properties": {
-              "LogGroupName": "/aws/http-api/hn-rest-api-dev"
-            }
-          },
-          "HttpApiStage": {
-            "Type": "AWS::ApiGatewayV2::Stage",
-            "Properties": {
-              "ApiId": {
-                "Ref": "HttpApi"
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
               },
-              "StageName": "$default",
-              "AutoDeploy": true,
-              "DefaultRouteSettings": {
-                "DetailedMetricsEnabled": false
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
               },
-              "AccessLogSettings": {
-                "DestinationArn": {
-                  "Fn::GetAtt": [
-                    "HttpApiLogGroup",
-                    "Arn"
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "AnalyzeLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
                   ]
-                },
-                "Format": "{\"requestTime\":\"$context.requestTime\",\"requestId\":\"$context.requestId\",\"apiId\":\"$context.apiId\",\"resourcePath\":\"$context.routeKey\",\"path\":\"$context.path\",\"httpMethod\":\"$context.httpMethod\",\"stage\":\"$context.stage\",\"status\":\"$context.status\",\"integrationStatus\":\"$context.integrationStatus\",\"integrationLatency\":\"$context.integrationLatency\",\"responseLatency\":\"$context.responseLatency\",\"responseLength\":\"$context.responseLength\",\"errorMessage\":\"$context.error.message\",\"format\":\"SLS_HTTP_API_LOG\",\"version\":\"1.0.0\"}"
-              }
-            },
-            "DependsOn": "HttpApiLogGroup"
+                }
+              },
+              "MethodResponses": []
+            }
           },
-          "AnalyzeLambdaPermissionHttpApi": {
+          "ApiGatewayDeployment1617875558621": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodGet"
+            ]
+          },
+          "AnalyzeLambdaPermissionApiGateway": {
             "Type": "AWS::Lambda::Permission",
             "Properties": {
               "FunctionName": {
@@ -314,48 +360,140 @@
                     },
                     ":",
                     {
-                      "Ref": "HttpApi"
+                      "Ref": "ApiGatewayRestApi"
                     },
-                    "/*"
+                    "/*/*"
                   ]
                 ]
               }
             }
           },
-          "HttpApiIntegrationAnalyze": {
-            "Type": "AWS::ApiGatewayV2::Integration",
+          "ApiGatewayLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "ApiId": {
-                "Ref": "HttpApi"
-              },
-              "IntegrationType": "AWS_PROXY",
-              "IntegrationUri": {
-                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"AnalyzeLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
-              },
-              "PayloadFormatVersion": "2.0",
-              "TimeoutInMillis": 6500
+              "LogGroupName": "/aws/api-gateway/hn-rest-api-dev"
             }
           },
-          "HttpApiRouteGet": {
-            "Type": "AWS::ApiGatewayV2::Route",
+          "CustomApiGatewayAccountCloudWatchRole": {
+            "Type": "Custom::ApiGatewayAccountRole",
+            "Version": 1,
             "Properties": {
-              "ApiId": {
-                "Ref": "HttpApi"
+              "ServiceToken": {
+                "Fn::GetAtt": [
+                  "CustomDashresourceDashapigwDashcwDashroleLambdaFunction",
+                  "Arn"
+                ]
+              }
+            }
+          },
+          "IamRoleCustomResourcesLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
               },
-              "RouteKey": "GET /",
-              "Target": {
-                "Fn::Join": [
-                  "/",
-                  [
-                    "integrations",
-                    {
-                      "Ref": "HttpApiIntegrationAnalyze"
-                    }
-                  ]
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "dev",
+                        "hn-rest-api",
+                        "custom-resources-lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Resource": {
+                          "Fn::Join": [
+                            ":",
+                            [
+                              "arn",
+                              {
+                                "Ref": "AWS::Partition"
+                              },
+                              "iam:",
+                              {
+                                "Ref": "AWS::AccountId"
+                              },
+                              "role/*"
+                            ]
+                          ]
+                        },
+                        "Action": [
+                          "iam:AttachRolePolicy",
+                          "iam:CreateRole",
+                          "iam:ListAttachedRolePolicies",
+                          "iam:PassRole"
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Resource": {
+                          "Fn::Join": [
+                            ":",
+                            [
+                              "arn",
+                              {
+                                "Ref": "AWS::Partition"
+                              },
+                              "apigateway:*::/account"
+                            ]
+                          ]
+                        },
+                        "Action": [
+                          "apigateway:GET",
+                          "apigateway:PATCH"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "CustomDashresourceDashapigwDashcwDashroleLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/hn-rest-api/dev/1617875578624-2021-04-08T09:52:58.624Z/custom-resources.zip"
+              },
+              "FunctionName": "hn-rest-api-undefined-custom-resource-apigw-cw-role",
+              "Handler": "apiGatewayCloudWatchRole/handler.handler",
+              "MemorySize": 1024,
+              "Runtime": "nodejs12.x",
+              "Timeout": 180,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleCustomResourcesLambdaExecution",
+                  "Arn"
                 ]
               }
             },
-            "DependsOn": "HttpApiIntegrationAnalyze"
+            "DependsOn": [
+              "IamRoleCustomResourcesLambdaExecution"
+            ]
           },
           "CloudWatchLogsSubscriptionFilterAnalyzeLogGroup": {
             "Type": "AWS::Logs::SubscriptionFilter",
@@ -367,13 +505,13 @@
               }
             }
           },
-          "CloudWatchLogsSubscriptionFilterHttpApiLogGroup": {
+          "CloudWatchLogsSubscriptionFilterApiGatewayLogGroup": {
             "Type": "AWS::Logs::SubscriptionFilter",
             "Properties": {
               "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:9c17fad2-391d-44ba-a745-a8c3451eda7d#9cZkwd42GKSghzMz35#hn-rest-api#dev",
-              "FilterPattern": "\"SLS_HTTP_API_LOG\"",
+              "FilterPattern": "\"SLS_ACCESS_LOG\"",
               "LogGroupName": {
-                "Ref": "HttpApiLogGroup"
+                "Ref": "ApiGatewayLogGroup"
               }
             }
           }
@@ -395,24 +533,18 @@
           "AnalyzeLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AnalyzeLambdaVersionsKNlsXhXs6uqWq3S0d0gpDjK98YppBf3QGrtsBFgs"
+              "Ref": "AnalyzeLambdaVersionpne3Ec1cHunrJvFwIHdRCmBoAUx7elr6x20aFZgqVE"
             }
           },
-          "HttpApiId": {
-            "Description": "Id of the HTTP API",
-            "Value": {
-              "Ref": "HttpApi"
-            }
-          },
-          "HttpApiUrl": {
-            "Description": "URL of the HTTP API",
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
             "Value": {
               "Fn::Join": [
                 "",
                 [
                   "https://",
                   {
-                    "Ref": "HttpApi"
+                    "Ref": "ApiGatewayRestApi"
                   },
                   ".execute-api.",
                   {
@@ -421,7 +553,8 @@
                   ".",
                   {
                     "Ref": "AWS::URLSuffix"
-                  }
+                  },
+                  "/dev"
                 ]
               ]
             }
@@ -511,8 +644,8 @@
         }
       },
       "logs": {
-        "httpApi": {
-          "format": "{\"requestTime\":\"$context.requestTime\",\"requestId\":\"$context.requestId\",\"apiId\":\"$context.apiId\",\"resourcePath\":\"$context.routeKey\",\"path\":\"$context.path\",\"httpMethod\":\"$context.httpMethod\",\"stage\":\"$context.stage\",\"status\":\"$context.status\",\"integrationStatus\":\"$context.integrationStatus\",\"integrationLatency\":\"$context.integrationLatency\",\"responseLatency\":\"$context.responseLatency\",\"responseLength\":\"$context.responseLength\",\"errorMessage\":\"$context.error.message\",\"format\":\"SLS_HTTP_API_LOG\",\"version\":\"1.0.0\"}"
+        "restApi": {
+          "format": "{\"requestTime\":\"$context.requestTime\",\"requestId\":\"$context.requestId\",\"apiId\":\"$context.apiId\",\"resourceId\":\"$context.resourceId\",\"resourcePath\":\"$context.resourcePath\",\"path\":\"$context.path\",\"httpMethod\":\"$context.httpMethod\",\"status\":\"$context.status\",\"authLatency\":\"$context.authorizer.integrationLatency\",\"integrationLatency\":\"$context.integrationLatency\",\"integrationStatus\":\"$context.integrationStatus\",\"responseLatency\":\"$context.responseLatency\",\"responseLength\":\"$context.responseLength\",\"errorMessage\":\"$context.error.message\",\"format\":\"SLS_ACCESS_LOG\",\"version\":\"1.0.0\"}"
         }
       },
       "vpc": {}
@@ -531,21 +664,20 @@
         "handler": "s_analyze.handler",
         "events": [
           {
-            "httpApi": {
-              "path": "/",
-              "method": "get"
-            },
-            "resolvedMethod": "GET",
-            "resolvedPath": "/"
+            "http": {
+              "path": "",
+              "method": "get",
+              "integration": "AWS_PROXY"
+            }
           }
         ],
+        "timeout": 120,
         "name": "hn-rest-api-dev-analyze",
         "package": {},
         "memory": 1024,
-        "timeout": 6,
         "runtime": "python3.8",
         "vpc": {},
-        "versionLogicalId": "AnalyzeLambdaVersionsKNlsXhXs6uqWq3S0d0gpDjK98YppBf3QGrtsBFgs"
+        "versionLogicalId": "AnalyzeLambdaVersionpne3Ec1cHunrJvFwIHdRCmBoAUx7elr6x20aFZgqVE"
       }
     },
     "configValidationMode": "warn",
@@ -554,11 +686,12 @@
     "org": "uridrori",
     "layers": {},
     "initialServerlessConfig": {
+      "app": "hnrest",
+      "org": "uridrori",
       "service": {
         "$ref": "$[\"service\"][\"serviceObject\"]"
       },
-      "app": "hnrest",
-      "org": "uridrori",
+      "frameworkVersion": "2",
       "provider": {
         "$ref": "$[\"service\"][\"provider\"]"
       },
@@ -579,7 +712,7 @@
     "artifact": "C:\\Users\\uriga\\PycharmProjects\\Exabeam\\.serverless\\hn-rest-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/hn-rest-api/dev/1617544828905-2021-04-04T14:00:28.905Z",
+    "artifactDirectoryName": "serverless/hn-rest-api/dev/1617875578624-2021-04-08T09:52:58.624Z",
     "artifact": "hn-rest-api.zip"
   }
 }

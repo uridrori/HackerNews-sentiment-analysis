@@ -11,30 +11,30 @@
 #
 # Happy Coding!
 
-service: hn-rest-api
 # app and org for use with dashboard.serverless.com
 app: hnrest
 org: uridrori
+service: hn-rest-api
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
-#frameworkVersion: '2'
+frameworkVersion: '2'
 
 provider:
   name: aws
   runtime: python3.8
-  lambdaHashingVersion: 20201221
+  lambdaHashingVersion: '20201221'
 
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
 
 # you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "comprehend:DetectSentiment"
+      Resource: "*"
 #    - Effect: "Allow"
 #      Action:
 #        - "s3:PutObject"
@@ -64,7 +64,7 @@ functions:
     #    NOTE: Please make sure to change your handler code to work with those events
     #    Check the event documentation for details
     events:
-      - httpApi:
+      - http:
           path: /
           method: get
     timeout:
