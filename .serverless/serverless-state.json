@@ -233,7 +233,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/hn-rest-api/dev/1617875578624-2021-04-08T09:52:58.624Z/hn-rest-api.zip"
+                "S3Key": "serverless/hn-rest-api/dev/1617879776922-2021-04-08T11:02:56.922Z/hn-rest-api.zip"
               },
               "Handler": "s_analyze.handler",
               "Runtime": "python3.8",
@@ -251,14 +251,14 @@
               "AnalyzeLogGroup"
             ]
           },
-          "AnalyzeLambdaVersionpne3Ec1cHunrJvFwIHdRCmBoAUx7elr6x20aFZgqVE": {
+          "AnalyzeLambdaVersion3ruxS0Jpc7i01C0JQWGFsIYFOSeuJHN44qpKH50nI7Q": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AnalyzeLambdaFunction"
               },
-              "CodeSha256": "TkUnBVU2inEOgY4U9MYG4ZTXduUebvHnYHOgoq+h8gA="
+              "CodeSha256": "z5sz8ZIcsvYvIT4aua7ONRtMLB0fegTqVXKT+hX31l4="
             }
           },
           "ApiGatewayRestApi": {
@@ -319,7 +319,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1617875558621": {
+          "ApiGatewayDeployment1617879755192": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -477,7 +477,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/hn-rest-api/dev/1617875578624-2021-04-08T09:52:58.624Z/custom-resources.zip"
+                "S3Key": "serverless/hn-rest-api/dev/1617879776922-2021-04-08T11:02:56.922Z/custom-resources.zip"
               },
               "FunctionName": "hn-rest-api-undefined-custom-resource-apigw-cw-role",
               "Handler": "apiGatewayCloudWatchRole/handler.handler",
@@ -533,7 +533,7 @@
           "AnalyzeLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AnalyzeLambdaVersionpne3Ec1cHunrJvFwIHdRCmBoAUx7elr6x20aFZgqVE"
+              "Ref": "AnalyzeLambdaVersion3ruxS0Jpc7i01C0JQWGFsIYFOSeuJHN44qpKH50nI7Q"
             }
           },
           "ServiceEndpoint": {
@@ -677,7 +677,7 @@
         "memory": 1024,
         "runtime": "python3.8",
         "vpc": {},
-        "versionLogicalId": "AnalyzeLambdaVersionpne3Ec1cHunrJvFwIHdRCmBoAUx7elr6x20aFZgqVE"
+        "versionLogicalId": "AnalyzeLambdaVersion3ruxS0Jpc7i01C0JQWGFsIYFOSeuJHN44qpKH50nI7Q"
       }
     },
     "configValidationMode": "warn",
@@ -712,7 +712,7 @@
     "artifact": "C:\\Users\\uriga\\PycharmProjects\\Exabeam\\.serverless\\hn-rest-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/hn-rest-api/dev/1617875578624-2021-04-08T09:52:58.624Z",
+    "artifactDirectoryName": "serverless/hn-rest-api/dev/1617879776922-2021-04-08T11:02:56.922Z",
     "artifact": "hn-rest-api.zip"
   }
 }
